@@ -11,7 +11,7 @@ nginx/certbot
 # ─── ENVIRONMENT FILES ────────────────────────────
 .env
 .env.*
-!.env.sample-cpanel  # Optional: keep a template
+!.env.sample  # Optional: keep a template
 !.env.dev  # Optional: keep a template
 
 # ─── STATIC & MEDIA FILES ─────────────────────────
