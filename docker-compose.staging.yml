@@ -6,5 +6,5 @@ services:
       - DJANGO_ENV=staging
     volumes:
       - ./backend/.env.staging:/django/.env.staging
-    certbot:
-      entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+  certbot:
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
