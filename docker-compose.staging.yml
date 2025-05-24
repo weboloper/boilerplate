@@ -1,0 +1,10 @@
+services:
+  backend:
+    command: >
+      sh -c "python manage.py collectstatic --noinput && gunicorn --bind 0.0.0.0:8000 config.wsgi:application"
+    environment:
+      - DJANGO_ENV=staging
+    volumes:
+      - ./backend/.env.staging:/django/.env.staging
+    certbot:
+      entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"

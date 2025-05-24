@@ -1,0 +1,28 @@
+# ======================
+# Django .gitignore
+# ======================
+
+# ─── DATABASE FILES ───────────────────────────────
+data/
+
+# ─── CERTBOT FILES ───────────────────────────────
+nginx/certbot
+
+# ─── ENVIRONMENT FILES ────────────────────────────
+.env
+.env.*
+!.env.sample-cpanel  # Optional: keep a template
+!.env.dev  # Optional: keep a template
+
+# ─── STATIC & MEDIA FILES ─────────────────────────
+staticfiles/
+media/
+uploads/
+
+# ─── MISC ─────────────────────────────────────────
+*.bak
+*.tmp
+
+# ─── VIRTUAL ENVIRONMENTS ─────────────
+env/
+venv/
