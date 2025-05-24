@@ -17,3 +17,7 @@ remove:
 docker rm $(docker ps -a -q)
 
 docker-compose up --build -d backend
+docker logs -f ef74d3452807
+
+docker exec -it ef74d3452807 /bin/sh
+chmod +x init.sh

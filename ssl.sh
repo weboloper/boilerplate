@@ -5,11 +5,29 @@ if ! [ -x "$(command -v docker-compose)" ]; then
   exit 1
 fi
 
-domains=(api.krippay.com)
+# domains=(api.domain.com)
+# domains=(api.domain.com www.api.domain.com)
+
+# === Prompt for domains ===
+read -p "Please enter domain(s), separated by commas (e.g., example.com,www.example.com): " input_domains
+IFS=',' read -r -a domains <<< "$input_domains"
+
+# === Prompt for email ===
+read -p "Please enter your email address (for Let's Encrypt notifications): " email
+
+# === Staging mode prompt ===
+read -p "Enable staging mode for testing? (y/N): " staging_input
+if [ "$staging_input" == "y" ] || [ "$staging_input" == "Y" ]; then
+  staging=1
+else
+  staging=0
+fi
+
+
 rsa_key_size=4096
-data_path="./data/certbot"
-email="" # Adding a valid address is strongly recommended
-staging=0 # Set to 1 if you're testing your setup to avoid hitting request limits
+data_path="./nginx/certbot"
+# email="weboloper@gmail.com" # Adding a valid address is strongly recommended
+# staging=1 # Set to 1 if you're testing your setup to avoid hitting request limits
 
 if [ -d "$data_path" ]; then
   read -p "Existing data found for $domains. Continue and replace existing certificate? (y/N) " decision
@@ -27,9 +45,9 @@ if [ ! -e "$data_path/conf/options-ssl-nginx.conf" ] || [ ! -e "$data_path/conf/
   echo
 fi
 
-echo "### Creating dummy certificate for $domains ..."
-path="/etc/letsencrypt/live/$domains"
-mkdir -p "$data_path/conf/live/$domains"
+echo "### Creating dummy certificate for $input_domains  ..."
+path="/etc/letsencrypt/live/${domains[0]}"
+mkdir -p "$data_path/conf/live/${domains[0]}"
 docker-compose run --rm --entrypoint "\
   openssl req -x509 -nodes -newkey rsa:$rsa_key_size -days 1\
     -keyout '$path/privkey.pem' \
@@ -42,15 +60,15 @@ echo "### Starting nginx ..."
 docker-compose up --force-recreate -d nginx
 echo
 
-echo "### Deleting dummy certificate for $domains ..."
+echo "### Deleting dummy certificate for $input_domains ..."
 docker-compose run --rm --entrypoint "\
-  rm -Rf /etc/letsencrypt/live/$domains && \
-  rm -Rf /etc/letsencrypt/archive/$domains && \
-  rm -Rf /etc/letsencrypt/renewal/$domains.conf" certbot
+  rm -Rf /etc/letsencrypt/live/${domains[0]} && \
+  rm -Rf /etc/letsencrypt/archive/${domains[0]} && \
+  rm -Rf /etc/letsencrypt/renewal/${domains[0]}.conf" certbot
 echo
 
 
-echo "### Requesting Let's Encrypt certificate for $domains ..."
+echo "### Requesting Let's Encrypt certificate for $input_domains ..."
 #Join $domains to -d args
 domain_args=""
 for domain in "${domains[@]}"; do
@@ -78,3 +96,4 @@ echo
 
 echo "### Reloading nginx ..."
 docker-compose exec nginx nginx -s reload
+
